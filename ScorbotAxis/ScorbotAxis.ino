@@ -3,14 +3,15 @@
 0         1         2         3         4         5         6         7         8         9
 012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
 ------------------------------------------------------------------------------------------------
+
 */
 
 // Configuration files
 #include "config.h"  
 
 /**SETUP FUNCTION */
-void setup() {  
-    mySerial.init();          
+void setup() {   
+    mySerial.init();     
     // mejorar esta inicialización de los ejes
     axisId.push_back(0);      
     axisId.push_back(1);
@@ -34,18 +35,29 @@ void loop() {
 
 /** 1- READ ALL DIGITAL INPUTS; ACTUAL STATE. ACTUAL IMAGE OF STATE MACHINE */ 
 /** 2- IF: CURRENT ARDUINO HAS BEEN SETED LIKE MASTER THEN EXECUTE THE MASTER ROUTINES (SEND ORDERS) ELSE: ?? */  
-    if(myArduino.getMasterFlag()){
-        myArduino.serialCommunications();
-        //myArduino.filterMyOrders();
-        //myArduino.sendOrders2Slaves();     
+    if(iAmMaster){
+        // check the serial port and process
+        if(mySerial.sentenceComplete()){            
+          orders = mySerial.getOrders();    
+          mySerial.printSentenceOrders();  
+          mySerial.flush();
+        };     
+        orders2Slaves = myArduino.filterMyOrders(orders);
+        // myI2C.sendOrders2Slaves(orders2Slaves);     
     }else{
-        myArduino.I2CCommunications();   
-    }   
+     /*// check I2C entry communications     
+     if(myI2C.sentenceComplete()){
+         orders = myI2C.getOrders();
+     }*/     
+    } 
+  
 /** 4- PROCESS THE ORDERS */ 
-    myArduino.processOrders(); 
-/** 5- ALL THE LOG WILL BE SHOWN */     
+    myArduino.processOrders(orders); 
+/** 5- ALL THE LOG WILL BE SHOWN */  
+    //myArduino.reportMachineState(mySerial);//a través de MySerial imprime por puerto serie o por I2c el estado de la maquina
 /** 6- UPDATE IMAGE VARIABLES OF STATE MACHINE  */
 /** 7- PREPARE FOR ANOTHER LOOP  */   
+    orders.clear();
     delay(2500);        
 }
 
@@ -59,7 +71,7 @@ void loop() {
 void serialEvent(){
   serialError =  mySerial.mySerialEvent();
   if(serialError){
-    mySerial.error("\n\n\n ---> Error: exceed Serial buffer size \n\n");
+    Serial.println("\n\n\n ---> Error: exceed Serial buffer size \n\n");
     mySerial.flush();
   }  
 }
