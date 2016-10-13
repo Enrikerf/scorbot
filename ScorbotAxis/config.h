@@ -13,7 +13,8 @@
 
 #include <Order.h>
 #include <MySerial.h>
-#include <MyArduino.h>
+#include <MyI2C.h>
+#include <MyAxesController.h>
 
 // Serial communication variables
 char    token                 = ' ';              // token for separate arguments
@@ -22,12 +23,13 @@ int     serialBaud            = 9600;
 /**  GLOBAL VARIABLES ------------------------------------------------------------------------*/
 
 bool          masterFlag    = true;
-vector<int>   axisId;
-//this instance of My serial is injected in myarduino instance as an agreggation
-Order         injectedOrder = Order();
-MySerial      mySerial = MySerial(serialBaud,token,injectedOrder,"DEBUG");
-//delete(injectedOrder) ??
-MyArduino     myArduino = MyArduino(&mySerial,masterFlag);
+vector<int>   axisId ={0,1,2};
+
+
+Order         injectedOrder = Order();// hay que quitar la inyección de dependencia
+MySerial      mySerial      = MySerial(serialBaud,token,injectedOrder,"DEBUG");
+MyI2C         myI2C         = MyI2C(&mySerial);
+MyAxesController     myController = MyAxesController(&mySerial,&myI2C,masterFlag,axisId);
 bool          serialError  = false; 
 
 #endif

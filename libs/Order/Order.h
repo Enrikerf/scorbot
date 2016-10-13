@@ -24,7 +24,7 @@ class Order{
 			BRAKE=1,
 			SET_BRAKE_PIN,
 			LOG_MODE,			
-			NO_RECONIZED_CMD=4};
+			NO_RECONIZED_CMD};
 			
 		enum    ARG {
 			ALL=1,

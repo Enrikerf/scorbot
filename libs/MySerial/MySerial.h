@@ -28,24 +28,7 @@ extern "C" {
 
 #define CR "\r\n"
 
-/*!
-* %s	replace with an string (char*)
-* %c	replace with an character
-* %d	replace with an integer value
-* \%l	replace with an long value
-* \%x	replace and convert integer value into hex
-* \%X	like %x but combine with 0x123AB
-* \%b	replace and convert integer value into binary
-* \%B	like %x but combine with 0b10100011
-* \%t	replace and convert boolean value into "t" or "f"
-* \%T	like %t but convert into "true" or "false"
-* 0LOG_MODE_NOOUTPUT no output 
-* 1LOG_MODE_ERRORSonly errors 
-* 2LOG_MODE_INFOS errors and info 
-* 3LOG_MODE_DEBUG errors, info and debug 
-* 4LOG_MODE_VERBOSE all 
-* <h1>History</h1><br>
-*/
+
 
 using namespace std;
 
@@ -111,6 +94,9 @@ class MySerial {
 
 		/** STATUS:V ||	Show by console the actual orders */
 		void logSentenceOrders();
+		
+		/** STATUS:V ||	Show by console the actual orders */
+		void logSentenceOrders(vector<Order> orders2Plot);
 
 		/** STATUS:IC  || */
 		void error(const char* msg, ...);

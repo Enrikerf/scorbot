@@ -38,7 +38,7 @@ void MySerial::init(long newSerialBaud){
 // --------------------      SETS      --------------------
 
 void MySerial::setLogMode(Order::ARG newLogMode, Order::ARG newStatus){
-	this->debug(CR"MySerial said: Mode to change:%d | new Status: %d "CR,newLogMode,newStatus);
+	this->debug(CR"MySerial said-> Mode to change:%d | new Status: %d "CR,newLogMode,newStatus);
 	int arrayPositionOfThisMode = getArrayPositionOfThisMode(newLogMode);
 	if(newStatus == Order::ARG::ON){
 		this->logMode[arrayPositionOfThisMode] = true;
@@ -69,7 +69,7 @@ int MySerial::getArrayPositionOfThisMode(Order::ARG mode){
 			arrayPositionOfThisMode = 4;		
 					break;					
 		default:			
-			this->error("\n MySerial said: setLogMode ARG newStatus unknown\n");
+			this->error(CR"MySerial said-> setLogMode ARG newStatus unknown\n");
 		break;
 	}
 	return arrayPositionOfThisMode;
@@ -97,30 +97,44 @@ vector<Order> MySerial::getOrders(){
 // --------------------      LOGS      --------------------
 
 void MySerial::logSentenceComponents(){
-	info("\n\n MySerial said:  Number of components:%d \n",this->sentenceComponents.size());
+	info(CR"MySerial said->  Number of components:%d \n",this->sentenceComponents.size());
 	for (int i=0; i<this->sentenceComponents.size();i++){
-		info("Component [%d]: %s "CR,i,this->sentenceComponents[i].c_str());
+		info(CR"MySerial said-> Component [%d]: %s "CR,i,this->sentenceComponents[i].c_str());
 	}
   
 }
 
 void MySerial::logSentenceOrders(){
-	info("\n\n Number of orders:%d",this->orders.size());
+	info("\n\n MySerial said: Number of orders:%d",this->orders.size());
 	for (int i=0; i<this->orders.size();i++){
 		debug("\n order [%d]:"CR,i);
 		debug("\t cmd Type: %s"CR,this->orders[i].cmdType.c_str());		
 		debug("\t cmd: %s"CR,this->orders[i].cmd.c_str());
 		debug("\t who: %d"CR,this->orders[i].who);		
-		debug("\t args: %s "CR,this->orders[i].args.c_str());
+		debug("\t vargs: %s "CR,this->orders[i].args.c_str());
 		for (int j=0; j<this->orders[i].vectorArgs.size();j++){
-			debug("\t arg[%d]: %d \n"CR,j,orders[i].vectorArgs[j]);
+			debug("\t\t arg[%d]: %d \n",j,orders[i].vectorArgs[j]);
+		}
+	}  
+}
+
+void MySerial::logSentenceOrders(vector<Order> orders2Plot){
+	info("\n\n MySerial said: Number of orders:%d",orders2Plot.size());
+	for (int i=0; i<orders2Plot.size();i++){
+		debug("\n order [%d]:"CR,i);
+		debug("\t cmd Type: %s"CR,orders2Plot[i].cmdType.c_str());		
+		debug("\t cmd: %s"CR,orders2Plot[i].cmd.c_str());
+		debug("\t who: %d"CR,orders2Plot[i].who);		
+		debug("\t vargs: %s "CR,orders2Plot[i].args.c_str());
+		for (int j=0; j<orders2Plot[i].vectorArgs.size();j++){
+			debug("\t\t arg[%d]: %d \n",j,orders2Plot[i].vectorArgs[j]);
 		}
 	}  
 }
 
 void MySerial::error(const char* msg, ...){
     if (shouldPrint(Order::ARG::ERROR)) {   
-		print ("\nERROR: ",0);
+		print ("\n MySerial ERROR-> ",0);
         va_list args;
         va_start(args, msg);
         print(msg,args);
@@ -197,8 +211,8 @@ int MySerial::parseSentenceByOrders(){
 };
 
 bool MySerial::mySerialEvent(){
-	debug(CR"-----------------------------------------------------------"CR);
-	debug(CR"MySerial said: New Serial Event, Number of bytes = %d"CR,Serial.available());
+	info(CR"-----------------------------------------------------------");
+	debug(CR"MySerial said-> New Serial Event, Number of bytes = %d",Serial.available());
 	
 	bool serialError = false;
 	if(Serial.available()>=this->SERIAL_BUFFER_SIZE){
@@ -208,14 +222,14 @@ bool MySerial::mySerialEvent(){
 		char inChar = (char)Serial.read();
 		if (inChar == '\n'){				
             sentenceCompleteFlag = true;
-			debug("\n MySerial said: Sentence complete (end by \ N) ");
+			debug(CR"MySerial said-> Sentence complete (end by \ N) ");
 		}
 		else{
 		    inputSentence += toupper(inChar); 
 			//debug("\n MySerial said: char: %c",inChar);
 		}   		
 	}	
-	debug("\n MySerial said: Final Sentence: %s",inputSentence.c_str());
+	debug(CR"MySerial said-> Final Sentence: %s",inputSentence.c_str());
 	return serialError;
 }
 
@@ -255,12 +269,12 @@ int MySerial::fillOrders(string cmdType, string cmd, vector<string> whos, vector
 		case Order::CMD_TYPE::AXES:		
 			// verificar que los whos son numeros validos
 			if(!this->verifyWhos(whos,whosInt)){
-				error("\n MySerial said: Some who param is not a number or not valid");
+				error(CR"MySerial said-> Some who param is not a number or not valid");
 				return toReturn;
 			};
 			// Verificar si hay el mismo numero args que de whos?
 			if(whos.size() != args.size()){		
-				error("\n MySerial said: Missing arguments in axes command: less args than axes ");
+				error(CR"MySerial said-> Missing arguments in axes command: less args than axes ");
 				return toReturn;
 			};
 			// Se rellena la variable orders de la clase.				
@@ -270,10 +284,11 @@ int MySerial::fillOrders(string cmdType, string cmd, vector<string> whos, vector
 				this->order.who = whosInt[nOrder];					
 				this->order.args = args[nOrder];
 				// fill vector<ARG> vectorArgs in Order
-				parseTool(this->order.args,',',parsedArgs);
+				parseTool(this->order.args[nOrder],',',parsedArgs);
 				this->order.setVectorArgs(parsedArgs);
-				
-				this->orders.push_back(this->order);	
+				// push prepared order in vector and clear to fill another one
+				this->orders.push_back(this->order);
+				this->order.clear();
 			}	
 			toReturn = whos.size();
 		break;
@@ -290,7 +305,7 @@ int MySerial::fillOrders(string cmdType, string cmd, vector<string> whos, vector
 			toReturn = orders.size();
 		break;
 		default:
-			error(" MySerial said: cmdType default fail");
+			error(CR"MySerial said->: cmdType default fail");
 			toReturn = -1;
 		break;
 	}		
@@ -305,19 +320,30 @@ bool MySerial::verifyWhos(vector<string> whos,vector<int> &whosInt){
 	for(int nOrder=0; nOrder<whos.size();nOrder++){
 		whosInt[nOrder]  = strtol(whos[nOrder].c_str(),&end,10);
 		if (!*end){
-			debug("\n MySerial said: valid who = %d",whosInt[nOrder]);
+			debug(CR"MySerial said-> valid who = %d",whosInt[nOrder]);
 			areValid = true;
 		}
 		else{
-			debug("\n MySerial said: invalid who = %T",end);
+			debug(CR"MySerial said-> invalid who = %T",end);
 			return areValid = false;
 		}		
 	}
 	return areValid;
 }
 
+/*!
+* %s	replace with an string (char*)
+* %c	replace with an character
+* %d	replace with an integer value
+* \%l	replace with an long value
+* \%x	replace and convert integer value into hex
+* \%X	like %x but combine with 0x123AB
+* \%b	replace and convert integer value into binary
+* \%B	like %x but combine with 0b10100011
+* \%t	replace and convert boolean value into "t" or "f"
+* \%T	like %t but convert into "true" or "false"
+*/
 void MySerial::print(const char *format, va_list args) {
-    //
     // loop through format string
     for (; *format != 0; ++format) {
         if (*format == '%') {

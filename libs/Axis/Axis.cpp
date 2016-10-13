@@ -12,40 +12,41 @@ Axis::Axis(MySerial *newMySerial){
 	this->mySerial = newMySerial;
 }
 
-void Axis::setId(short newId){
+void Axis::setId(unsigned char newId){
 	this->id = newId;
 }
 
-short Axis::getId(){
+unsigned char Axis::getId(){
 	return this->id;
 }
 
-void Axis::setBrakePin(short newBrakePin){
+void Axis::setBrakePin(unsigned char newBrakePin){
 	this->brakePin = newBrakePin;
 	pinMode(this->brakePin, OUTPUT);
 	
 }
 
+
 int Axis::processOrder(Order newOrder){
 	
 	int resultOfProcessedOrder = -1; // error by default
 
-	this->mySerial->debug(CR"Here Axis: %d | Doing CMD: "CR,this->id,newOrder.cmd.c_str());
+	this->mySerial->debug(CR"AXIS[%d]said-> Doing CMD: ",this->id,newOrder.cmd.c_str());
 	
 	switch(newOrder.recognizeCmd()){
-		case Order::CMD::BRAKE:
-			brake(newOrder.recognizeArg());
-			resultOfProcessedOrder = 1;
-			break;	
 		case Order::CMD::SET_BRAKE_PIN:
 			int Pin;
 			Pin=13;
 			str2Int(newOrder.args,Pin);
 			setBrakePin(Pin);
 			resultOfProcessedOrder = 1;
-			break;			
+			break;	
+		case Order::CMD::BRAKE:
+			brake(newOrder.recognizeArg());
+			resultOfProcessedOrder = 1;
+			break;
 		default:		
-			this->mySerial->error("\n AXIS: Comando desconocido:");			
+			this->mySerial->error(CR"AXIS[%d]said-> Comando desconocido:",this->id,newOrder.cmd.c_str());			
 			resultOfProcessedOrder = -1;
 			break;
 	}
@@ -56,10 +57,10 @@ void Axis::brake(Order::ARG brakeMode){
 	
 	if(brakeMode == Order::ARG::ON){
 		digitalWrite(this->brakePin,HIGH);
-		this->mySerial->debug(CR"Here Axis[%d]: brake ON "CR,this->id);
+		this->mySerial->debug(CR"AXIS[%d]said-> brake ON ",this->id);
 	}else{		
 		digitalWrite(this->brakePin,LOW);
-		this->mySerial->debug(CR"Here Axis[%d]: brake OFF "CR,this->id);
+		this->mySerial->debug(CR"AXIS[%d]said-> brake OFF ",this->id);
 	}
 }
 

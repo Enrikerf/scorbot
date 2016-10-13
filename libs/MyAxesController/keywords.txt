@@ -9,12 +9,12 @@
 #######################################
 #	Methods	and	Functions	(KEYWORD2)
 ####################################### 
-MyArduino KEYWORD2	error output
+MyAxesController KEYWORD2	error output
 
 #######################################
 #	Instances	(KEYWORD2)
 #######################################
-MyArduino	KEYWORD2	MyArduino library
+MyAxesController	KEYWORD2	MyAxesController library
 
 #######################################
 #	Constants	(LITERAL1)

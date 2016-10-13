@@ -17,10 +17,10 @@ void Order::setVectorArgs(vector<string> parsedArgs){
 	
 	for(int nArg=0; nArg<parsedArgs.size();nArg++){
 		vectorArgs.push_back(recognizeArg(parsedArgs[nArg]));
-		Serial.print("\n\n parsedArg:");
-		Serial.println(parsedArgs[nArg].c_str());
-		Serial.print("\n Equivale:");
-		Serial.println(recognizeArg(parsedArgs[nArg]));
+		Serial.print("\n Class Order say-> parsedArg:");
+		Serial.print(parsedArgs[nArg].c_str());
+		Serial.print("|> Equivale a:");
+		Serial.print(recognizeArg(parsedArgs[nArg]));
 	}	
 }
 
