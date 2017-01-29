@@ -6,27 +6,33 @@
 #include <StandardCplusplus.h>
 #include <serstream>
 #include <string>
-#include <sstream>
+//#include <sstream>
 #include <vector>
-#include <iterator>
-#include <iostream>
+//#include <iterator>
+//#include <iostream>
 
-#include <Order.h>
-#include <MySerial.h>
 using namespace std;
 
 class MyI2C{
 	
 	private:
-		vector<Order> orders;
-		MySerial *mySerial;
-	
+		bool masterFlag;
+		int slaveAddress;
+		// Sentence variables
+		string inputSentence;
+		boolean sentenceCompleteFlag;   // whether the string is complete
+		char endOfSentence;		 // character to indicate end of Sentence
+		short inputSentenceMaxLength;	
+		short i2cBufferSize;
 	public:
-		MyI2C(MySerial *newMySerial);	
+		MyI2C(bool masterFlag,int slaveAddress);	
 		~MyI2C(){}; 
 		void init();
-		void sendOrders2Slaves(vector<Order> orders2Send);
+		void init(int slaveAddress);
+		void requestRoutine();
+		void receiveRoutine(int nBytes);		
+		void flush();
 	private:
-	
+		
 };
 #endif

@@ -37,7 +37,7 @@ class MySerial {
 		// Sentence variables
 		string         inputSentence;        // String to hold incoming data
 		boolean        sentenceCompleteFlag;   // whether the string is complete
-		char           separatorToken;       // token for separate Components
+z
 		char           endOfSentence;		 // character to indicate end of Sentence
 		vector<string> sentenceComponents; 	 // Hold sentence components
 		// orders variables
@@ -85,7 +85,7 @@ class MySerial {
 		bool getSentenceCompleteFlag();
 
 		/** STATUS:V || Parse sentence by orders and return these orders */
-		vector<Order> MySerial::getOrders();
+		vector<Order> getOrders();
 
 		// --------------------      LOGS      --------------------
 

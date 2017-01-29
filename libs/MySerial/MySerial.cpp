@@ -38,7 +38,7 @@ void MySerial::init(long newSerialBaud){
 // --------------------      SETS      --------------------
 
 void MySerial::setLogMode(Order::ARG newLogMode, Order::ARG newStatus){
-	this->debug(CR"MySerial said-> Mode to change:%d | new Status: %d "CR,newLogMode,newStatus);
+	this->debug( CR "MySerial said-> Mode to change:%d | new Status: %d " CR ,newLogMode,newStatus);
 	int arrayPositionOfThisMode = getArrayPositionOfThisMode(newLogMode);
 	if(newStatus == Order::ARG::ON){
 		this->logMode[arrayPositionOfThisMode] = true;
@@ -69,7 +69,7 @@ int MySerial::getArrayPositionOfThisMode(Order::ARG mode){
 			arrayPositionOfThisMode = 4;		
 					break;					
 		default:			
-			this->error(CR"MySerial said-> setLogMode ARG newStatus unknown\n");
+			this->error( CR "MySerial said-> setLogMode ARG newStatus unknown\n");
 		break;
 	}
 	return arrayPositionOfThisMode;
@@ -97,9 +97,9 @@ vector<Order> MySerial::getOrders(){
 // --------------------      LOGS      --------------------
 
 void MySerial::logSentenceComponents(){
-	info(CR"MySerial said->  Number of components:%d \n",this->sentenceComponents.size());
+	info( CR "MySerial said->  Number of components:%d \n",this->sentenceComponents.size());
 	for (int i=0; i<this->sentenceComponents.size();i++){
-		info(CR"MySerial said-> Component [%d]: %s "CR,i,this->sentenceComponents[i].c_str());
+		info( CR  "MySerial said-> Component [%d]: %s " CR ,i,this->sentenceComponents[i].c_str());
 	}
   
 }
@@ -107,11 +107,11 @@ void MySerial::logSentenceComponents(){
 void MySerial::logSentenceOrders(){
 	info("\n\n MySerial said: Number of orders:%d",this->orders.size());
 	for (int i=0; i<this->orders.size();i++){
-		debug("\n order [%d]:"CR,i);
-		debug("\t cmd Type: %s"CR,this->orders[i].cmdType.c_str());		
-		debug("\t cmd: %s"CR,this->orders[i].cmd.c_str());
-		debug("\t who: %d"CR,this->orders[i].who);		
-		debug("\t vargs: %s "CR,this->orders[i].args.c_str());
+		debug("\n order [%d]:"  CR ,i);
+		debug("\t cmd Type: %s"  CR ,this->orders[i].cmdType.c_str());		
+		debug("\t cmd: %s"  CR ,this->orders[i].cmd.c_str());
+		debug("\t who: %d"  CR ,this->orders[i].who);		
+		debug("\t vargs: %s "  CR ,this->orders[i].args.c_str());
 		for (int j=0; j<this->orders[i].vectorArgs.size();j++){
 			debug("\t\t arg[%d]: %d \n",j,orders[i].vectorArgs[j]);
 		}
@@ -121,11 +121,11 @@ void MySerial::logSentenceOrders(){
 void MySerial::logSentenceOrders(vector<Order> orders2Plot){
 	info("\n\n MySerial said: Number of orders:%d",orders2Plot.size());
 	for (int i=0; i<orders2Plot.size();i++){
-		debug("\n order [%d]:"CR,i);
-		debug("\t cmd Type: %s"CR,orders2Plot[i].cmdType.c_str());		
-		debug("\t cmd: %s"CR,orders2Plot[i].cmd.c_str());
-		debug("\t who: %d"CR,orders2Plot[i].who);		
-		debug("\t vargs: %s "CR,orders2Plot[i].args.c_str());
+		debug("\n order [%d]:" CR ,i);
+		debug("\t cmd Type: %s" CR ,orders2Plot[i].cmdType.c_str());		
+		debug("\t cmd: %s" CR ,orders2Plot[i].cmd.c_str());
+		debug("\t who: %d" CR ,orders2Plot[i].who);		
+		debug("\t vargs: %s " CR ,orders2Plot[i].args.c_str());
 		for (int j=0; j<orders2Plot[i].vectorArgs.size();j++){
 			debug("\t\t arg[%d]: %d \n",j,orders2Plot[i].vectorArgs[j]);
 		}
@@ -211,8 +211,8 @@ int MySerial::parseSentenceByOrders(){
 };
 
 bool MySerial::mySerialEvent(){
-	info(CR"-----------------------------------------------------------");
-	debug(CR"MySerial said-> New Serial Event, Number of bytes = %d",Serial.available());
+	info( CR "-----------------------------------------------------------");
+	debug( CR "MySerial said-> New Serial Event, Number of bytes = %d",Serial.available());
 	
 	bool serialError = false;
 	if(Serial.available()>=this->SERIAL_BUFFER_SIZE){
@@ -222,14 +222,14 @@ bool MySerial::mySerialEvent(){
 		char inChar = (char)Serial.read();
 		if (inChar == '\n'){				
             sentenceCompleteFlag = true;
-			debug(CR"MySerial said-> Sentence complete (end by \ N) ");
+			debug( CR "MySerial said-> Sentence complete (end by \ N) ");
 		}
 		else{
 		    inputSentence += toupper(inChar); 
 			//debug("\n MySerial said: char: %c",inChar);
 		}   		
 	}	
-	debug(CR"MySerial said-> Final Sentence: %s",inputSentence.c_str());
+	debug( CR "MySerial said-> Final Sentence: %s",inputSentence.c_str());
 	return serialError;
 }
 
@@ -269,12 +269,12 @@ int MySerial::fillOrders(string cmdType, string cmd, vector<string> whos, vector
 		case Order::CMD_TYPE::AXES:		
 			// verificar que los whos son numeros validos
 			if(!this->verifyWhos(whos,whosInt)){
-				error(CR"MySerial said-> Some who param is not a number or not valid");
+				error( CR "MySerial said-> Some who param is not a number or not valid");
 				return toReturn;
 			};
 			// Verificar si hay el mismo numero args que de whos?
 			if(whos.size() != args.size()){		
-				error(CR"MySerial said-> Missing arguments in axes command: less args than axes ");
+				error( CR "MySerial said-> Missing arguments in axes command: less args than axes ");
 				return toReturn;
 			};
 			// Se rellena la variable orders de la clase.				
@@ -305,7 +305,7 @@ int MySerial::fillOrders(string cmdType, string cmd, vector<string> whos, vector
 			toReturn = orders.size();
 		break;
 		default:
-			error(CR"MySerial said->: cmdType default fail");
+			error( CR "MySerial said->: cmdType default fail");
 			toReturn = -1;
 		break;
 	}		
@@ -320,11 +320,11 @@ bool MySerial::verifyWhos(vector<string> whos,vector<int> &whosInt){
 	for(int nOrder=0; nOrder<whos.size();nOrder++){
 		whosInt[nOrder]  = strtol(whos[nOrder].c_str(),&end,10);
 		if (!*end){
-			debug(CR"MySerial said-> valid who = %d",whosInt[nOrder]);
+			debug( CR "MySerial said-> valid who = %d",whosInt[nOrder]);
 			areValid = true;
 		}
 		else{
-			debug(CR"MySerial said-> invalid who = %T",end);
+			debug( CR "MySerial said-> invalid who = %T",end);
 			return areValid = false;
 		}		
 	}
@@ -411,7 +411,7 @@ void MySerial::print(const char *format, va_list args) {
         }
         Serial.print(*format);
     }
- }
+}
   
 bool MySerial::shouldPrint(Order::ARG mode){
 	bool result = false;

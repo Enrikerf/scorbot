@@ -11,10 +11,12 @@
 
 #define FIRMWARE_VERSION "scorbotArduino Version 1.0.0 - 2016/09/11"
 
-#include <Order.h>
-#include <MySerial.h>
+#include <Wire.h>
+
+//#include <Order.h>
+//#include <MySerial.h>
 #include <MyI2C.h>
-#include <MyAxesController.h>
+//#include <MyAxesController.h>
 
 // Serial communication variables
 char    token                 = ' ';              // token for separate arguments
@@ -22,14 +24,14 @@ int     serialBaud            = 9600;
 
 /**  GLOBAL VARIABLES ------------------------------------------------------------------------*/
 
-bool          masterFlag    = true;
-vector<int>   axisId ={0,1,2};
+bool          masterFlag    = false;
+//vector<int>   axisId ={0,1,2};
+int           slaveAddress = 4;
 
-
-Order         injectedOrder = Order();// hay que quitar la inyección de dependencia
-MySerial      mySerial      = MySerial(serialBaud,token,injectedOrder,"DEBUG");
-MyI2C         myI2C         = MyI2C(&mySerial);
-MyAxesController     myController = MyAxesController(&mySerial,&myI2C,masterFlag,axisId);
+//Order         injectedOrder = Order();// hay que quitar la inyección de dependencia
+//MySerial static     mySerial      = MySerial(serialBaud,token,injectedOrder,"DEBUG");
+MyI2C    static     myI2C         = MyI2C(masterFlag,slaveAddress);
+//MyAxesController     myController = MyAxesController(&mySerial,&myI2C,masterFlag,axisId);
 bool          serialError  = false; 
 
 #endif
