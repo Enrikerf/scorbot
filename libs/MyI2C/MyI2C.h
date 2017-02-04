@@ -29,6 +29,8 @@ class MyI2C{
 		~MyI2C(){}; 
 		void init();
 		void init(int slaveAddress);
+		bool getSentenceCompleteFlag();
+		string getSentence();
 		void requestRoutine();
 		void receiveRoutine(int nBytes);		
 		void flush();

@@ -1,0 +1,32 @@
+#######################################
+#	Syntax	Coloring	Map	logging	lib
+#######################################
+
+#######################################
+#	Datatypes	(KEYWORD1)
+#######################################
+
+#######################################
+#	Methods	and	Functions	(KEYWORD2)
+####################################### 
+MyCommunicator KEYWORD2			error output
+parseString	KEYWORD2		error output
+getSentenceComponents   	error output
+setSentence   	error output
+getInputSentence			error output
+parseSentenceByComponents 	error output
+parseSentenceByOrders		error output
+mySerialEvent 				error output
+sentenceComplete			error output
+flush						error output
+printSentenceComponents 	error output
+printSentenceOrders 		error output
+
+#######################################
+#	Instances	(KEYWORD2)
+#######################################
+MyCommunications	KEYWORD2	MyCommunications library
+
+#######################################
+#	Constants	(LITERAL1)
+#######################################

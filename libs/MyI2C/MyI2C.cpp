@@ -24,6 +24,14 @@ void MyI2C::init(){
     }
 }
 
+bool MyI2C::getSentenceCompleteFlag(){
+    return this->sentenceCompleteFlag;
+}
+
+string MyI2C::getSentence(){
+    return this->inputSentence;
+}
+
 void MyI2C::init(int slaveAddress){
     // Begin Wire Comunication
     this->slaveAddress = slaveAddress;
@@ -36,21 +44,24 @@ void MyI2C::init(int slaveAddress){
 
 void MyI2C::receiveRoutine(int nBytes){
 	Serial.print("MyI2C said-> New I2c Event, Number of bytes:");Serial.println(nBytes);    
-
+    char inChar;
+    char beginChar = Wire.read(); // is &
 	while (Wire.available()) {		
 		char inChar = Wire.read();
 		if (inChar == '\n'){	
-            Serial.print("MyI2C said-> Sentence complete (end by \ N): ");Serial.println(inputSentence.c_str());
-            // se le tiene que quitar el primer byte que el protocolo obliga a enviar CMD
-            this->inputSentence.erase(inputSentence.begin());
-
+            this->sentenceCompleteFlag=true;
 		}
 		else{
 		    this->inputSentence += inChar; 
             Serial.print("char:");Serial.println(inChar);
 		}   		
 	}	
-    Serial.print("MyI2C said-> Final Sentence:");Serial.println(this->inputSentence.c_str());
+    if(!this->sentenceCompleteFlag){
+        Serial.println("MyI2C said-> Incomplete sentence; waiting for another stack.");
+    }else{
+        Serial.print("MyI2C said-> Final Sentence:");Serial.println(this->inputSentence.c_str());
+    }
+    
 }
 
 void MyI2C::requestRoutine(){

@@ -7,19 +7,20 @@
 
 MySerial::MySerial(){}
 
-MySerial::MySerial(long newSerialBaud, char newSeparaToken,Order newOrder, string newLogMode){	
+MySerial::MySerial(long newSerialBaud, Order newOrder, string newLogMode){	
 	// Sentence variables	
-		inputSentence       = "";        
-		sentenceCompleteFlag  = false;   
-		separatorToken      = newSeparaToken;       
-		endOfSentence 		= '\n';
-		//vector<string> sentenceComponents; 
-	// orders variables
-		order = newOrder;
+		this->inputSentence       = "";        
+		this->sentenceCompleteFlag  = false;        
+		this->endOfSentence 		= '\n';
 	// Serial communication variables	
-		serialBaud          = newSerialBaud;  
-		SERIAL_BUFFER_SIZE  = 63;
-		setLogMode(this->order.recognizeArg(newLogMode),Order::ARG::ON);
+		this->serialBaud          = newSerialBaud;  
+		this->SERIAL_BUFFER_SIZE  = 63;
+		this->logMode[0]=1;
+		this->logMode[1]=1;
+		this->logMode[2]=1;
+		this->logMode[3]=1;
+		this->logMode[4]=1;
+		//setLogMode(this->order.recognizeArg(newLogMode),Order::ARG::ON);
 }
 
 void MySerial::init(){	 
@@ -75,10 +76,6 @@ int MySerial::getArrayPositionOfThisMode(Order::ARG mode){
 	return arrayPositionOfThisMode;
 }
 
-vector<string>  MySerial::getSentenceComponents(){
-	return this->sentenceComponents;
-}
-
 string MySerial::getInputSentence(){
 	return this->inputSentence;
 };
@@ -87,50 +84,10 @@ bool MySerial::getSentenceCompleteFlag(){
 	return sentenceCompleteFlag;
 }
 
-vector<Order> MySerial::getOrders(){
-	// esto no debe ir aquí: debería haber un método que sea procces sentence
-	this->parseSentenceByOrders();
-	
-	return this->orders;
-}
+
 
 // --------------------      LOGS      --------------------
 
-void MySerial::logSentenceComponents(){
-	info( CR "MySerial said->  Number of components:%d \n",this->sentenceComponents.size());
-	for (int i=0; i<this->sentenceComponents.size();i++){
-		info( CR  "MySerial said-> Component [%d]: %s " CR ,i,this->sentenceComponents[i].c_str());
-	}
-  
-}
-
-void MySerial::logSentenceOrders(){
-	info("\n\n MySerial said: Number of orders:%d",this->orders.size());
-	for (int i=0; i<this->orders.size();i++){
-		debug("\n order [%d]:"  CR ,i);
-		debug("\t cmd Type: %s"  CR ,this->orders[i].cmdType.c_str());		
-		debug("\t cmd: %s"  CR ,this->orders[i].cmd.c_str());
-		debug("\t who: %d"  CR ,this->orders[i].who);		
-		debug("\t vargs: %s "  CR ,this->orders[i].args.c_str());
-		for (int j=0; j<this->orders[i].vectorArgs.size();j++){
-			debug("\t\t arg[%d]: %d \n",j,orders[i].vectorArgs[j]);
-		}
-	}  
-}
-
-void MySerial::logSentenceOrders(vector<Order> orders2Plot){
-	info("\n\n MySerial said: Number of orders:%d",orders2Plot.size());
-	for (int i=0; i<orders2Plot.size();i++){
-		debug("\n order [%d]:" CR ,i);
-		debug("\t cmd Type: %s" CR ,orders2Plot[i].cmdType.c_str());		
-		debug("\t cmd: %s" CR ,orders2Plot[i].cmd.c_str());
-		debug("\t who: %d" CR ,orders2Plot[i].who);		
-		debug("\t vargs: %s " CR ,orders2Plot[i].args.c_str());
-		for (int j=0; j<orders2Plot[i].vectorArgs.size();j++){
-			debug("\t\t arg[%d]: %d \n",j,orders2Plot[i].vectorArgs[j]);
-		}
-	}  
-}
 
 void MySerial::error(const char* msg, ...){
     if (shouldPrint(Order::ARG::ERROR)) {   
@@ -167,49 +124,6 @@ void MySerial::verbose(const char* msg, ...){
 
 // --------------------      FUNCTIONALITIES     --------------------
 
-
-int MySerial::parseSentenceByComponents(){
-	int numberOfSentenceComponents = parseTool(this->inputSentence,this->separatorToken,this->sentenceComponents);
-	return numberOfSentenceComponents;
-};
-
-int MySerial::parseSentenceByOrders(){
-	
-	int toReturn;
-	string cmdType;
-	vector<string> whos;
-	string cmd;
-	vector<string> args;	
-	
-	// se divide la Sentence por components
-	parseSentenceByComponents();
-	
-	// primero se coge el tipo de comando
-	cmdType = sentenceComponents[0];
-	
-	// Segundo se coge el comando (Depurar cmd no es necesario). La clase axis sabrá si es correcto	
-	cmd = sentenceComponents[1];
-	
-	// Depurar los demás sentenceComponents... 	
-	for (int i=2; i<sentenceComponents.size();i++){
-		// si el comando es de clase axes el primer args son los whos
-		if(!strcmp(cmdType.c_str(),"AXES") && i == 2){ 
-			// Depurar sentenceComponents[2] if == all --> 
-			if(!strcmp(sentenceComponents[i].c_str(),"ALL")){		
-				sentenceComponents[i] = "0,1,2,3,4,5";
-			};
-			// TODO: habría que verificar que son números
-			this->parseTool(sentenceComponents[i],',',whos);
-		}else{
-			args.push_back(sentenceComponents[i]);
-		}					
-	}	
-	
-	toReturn = this->fillOrders(cmdType,cmd,whos,args);
-
-	return toReturn;
-};
-
 bool MySerial::mySerialEvent(){
 	info( CR "-----------------------------------------------------------");
 	debug( CR "MySerial said-> New Serial Event, Number of bytes = %d",Serial.available());
@@ -234,102 +148,12 @@ bool MySerial::mySerialEvent(){
 }
 
 void MySerial::flush(){
-// Sentence variables
-	//this->inputSentence.clear();
+	// Sentence variables
 	inputSentence       = "";      		// Comprove if it is necesary
 	sentenceCompleteFlag  = false;   		// whether the string is complete
-	//separatorToken      = newToken;   // token for separate arguments
-	//endOfSentence 		= '\n';
-	sentenceComponents.clear();
-	//vector<string> sentenceComponents; 
-    order.clear();
-	orders.clear();	
-// Serial communication variables
 }
 
-// --------------------     PRIVATE METHODS      --------------------
-
-int MySerial::parseTool(string stringToParse, char token, vector<string> &stringParsed){
-	int numberOfParts = 0; 
-	string part;
-	stringstream ssStringToParse(stringToParse);		
-	while(getline(ssStringToParse,part,token) && part.size() > 0){
-		stringParsed.push_back(part);
-		numberOfParts++;		
-	}   
-	return numberOfParts;
-}
-
-int MySerial::fillOrders(string cmdType, string cmd, vector<string> whos, vector<string> args){
-	int toReturn = -1;
-	vector<int> whosInt;	
-	vector<string> parsedArgs;
-	
-	switch( this->order.recognizeCmdType(cmdType) ){		
-		case Order::CMD_TYPE::AXES:		
-			// verificar que los whos son numeros validos
-			if(!this->verifyWhos(whos,whosInt)){
-				error( CR "MySerial said-> Some who param is not a number or not valid");
-				return toReturn;
-			};
-			// Verificar si hay el mismo numero args que de whos?
-			if(whos.size() != args.size()){		
-				error( CR "MySerial said-> Missing arguments in axes command: less args than axes ");
-				return toReturn;
-			};
-			// Se rellena la variable orders de la clase.				
-			for(int nOrder; nOrder<whos.size();nOrder++){
-				this->order.cmdType = cmdType;
-				this->order.cmd = cmd;
-				this->order.who = whosInt[nOrder];					
-				this->order.args = args[nOrder];
-				// fill vector<ARG> vectorArgs in Order
-				parseTool(this->order.args[nOrder],',',parsedArgs);
-				this->order.setVectorArgs(parsedArgs);
-				// push prepared order in vector and clear to fill another one
-				this->orders.push_back(this->order);
-				this->order.clear();
-			}	
-			toReturn = whos.size();
-		break;
-		case Order::CMD_TYPE::ARD:
-			this->order.cmdType = cmdType;
-			this->order.cmd = cmd;
-			this->order.who = -1;					
-			this->order.args = args[0];
-			// fill vector<ARG> vectorArgs in Order
-			parseTool(this->order.args,',',parsedArgs);
-			this->order.setVectorArgs(parsedArgs);		
-			
-			this->orders.push_back(this->order);
-			toReturn = orders.size();
-		break;
-		default:
-			error( CR "MySerial said->: cmdType default fail");
-			toReturn = -1;
-		break;
-	}		
-		
-	return toReturn;
-}
-
-bool MySerial::verifyWhos(vector<string> whos,vector<int> &whosInt){
-	
-	bool areValid = false;
-	char *end;
-	for(int nOrder=0; nOrder<whos.size();nOrder++){
-		whosInt[nOrder]  = strtol(whos[nOrder].c_str(),&end,10);
-		if (!*end){
-			debug( CR "MySerial said-> valid who = %d",whosInt[nOrder]);
-			areValid = true;
-		}
-		else{
-			debug( CR "MySerial said-> invalid who = %T",end);
-			return areValid = false;
-		}		
-	}
-	return areValid;
-}
+// --------------------     PRIVATE METHODS      -------------------
 
 /*!
 * %s	replace with an string (char*)
