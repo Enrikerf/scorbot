@@ -7,7 +7,7 @@
 
 MySerial::MySerial(){}
 
-MySerial::MySerial(long newSerialBaud, Order newOrder, string newLogMode){	
+MySerial::MySerial(long newSerialBaud, string newLogMode){	
 	// Sentence variables	
 		this->inputSentence       = "";        
 		this->sentenceCompleteFlag  = false;        
@@ -15,12 +15,11 @@ MySerial::MySerial(long newSerialBaud, Order newOrder, string newLogMode){
 	// Serial communication variables	
 		this->serialBaud          = newSerialBaud;  
 		this->SERIAL_BUFFER_SIZE  = 63;
-		this->logMode[0]=1;
-		this->logMode[1]=1;
-		this->logMode[2]=1;
-		this->logMode[3]=1;
-		this->logMode[4]=1;
-		//setLogMode(this->order.recognizeArg(newLogMode),Order::ARG::ON);
+		this->logMode[0]=false;
+		this->logMode[1]=true;
+		this->logMode[2]=true;
+		this->logMode[3]=true;
+		this->logMode[3]=true;
 }
 
 void MySerial::init(){	 
@@ -38,43 +37,7 @@ void MySerial::init(long newSerialBaud){
 
 // --------------------      SETS      --------------------
 
-void MySerial::setLogMode(Order::ARG newLogMode, Order::ARG newStatus){
-	this->debug( CR "MySerial said-> Mode to change:%d | new Status: %d " CR ,newLogMode,newStatus);
-	int arrayPositionOfThisMode = getArrayPositionOfThisMode(newLogMode);
-	if(newStatus == Order::ARG::ON){
-		this->logMode[arrayPositionOfThisMode] = true;
-	}else{
-		this->logMode[arrayPositionOfThisMode] = false;
-	}
-		
-}
-
 // --------------------      GETS      --------------------
-
-int MySerial::getArrayPositionOfThisMode(Order::ARG mode){
-	int arrayPositionOfThisMode;
-	switch(mode){
-		case Order::ARG::NO_OUTPUT:
-			arrayPositionOfThisMode = 0;
-			break;	
-		case Order::ARG::ERROR:	
-			arrayPositionOfThisMode = 1;		
-			break;	
-		case Order::ARG::INFO:	
-			arrayPositionOfThisMode = 2;		
-			break;	
-		case Order::ARG::DEBUG:		
-			arrayPositionOfThisMode = 3;		
-					break;	
-		case Order::ARG::VERBOSE:	
-			arrayPositionOfThisMode = 4;		
-					break;					
-		default:			
-			this->error( CR "MySerial said-> setLogMode ARG newStatus unknown\n");
-		break;
-	}
-	return arrayPositionOfThisMode;
-}
 
 string MySerial::getInputSentence(){
 	return this->inputSentence;
@@ -90,7 +53,7 @@ bool MySerial::getSentenceCompleteFlag(){
 
 
 void MySerial::error(const char* msg, ...){
-    if (shouldPrint(Order::ARG::ERROR)) {   
+    if (shouldPrint(MySerial::LOG_MODE::ERROR)) {   
 		print ("\n MySerial ERROR-> ",0);
         va_list args;
         va_start(args, msg);
@@ -99,7 +62,7 @@ void MySerial::error(const char* msg, ...){
 }
 
 void MySerial::info(const char* msg, ...){
-    if (shouldPrint(Order::ARG::INFO)) {
+    if (shouldPrint(MySerial::LOG_MODE::INFO)) {
         va_list args;
         va_start(args, msg);
         print(msg,args);
@@ -107,7 +70,7 @@ void MySerial::info(const char* msg, ...){
 }
 
 void MySerial::debug(const char* msg, ...){
-    if (shouldPrint(Order::ARG::DEBUG)) {
+    if (shouldPrint(MySerial::LOG_MODE::DEBUG)) {
         va_list args;
         va_start(args, msg);
         print(msg,args);
@@ -115,7 +78,7 @@ void MySerial::debug(const char* msg, ...){
 }
 
 void MySerial::verbose(const char* msg, ...){
-    if (shouldPrint(Order::ARG::VERBOSE)) {
+    if (shouldPrint(MySerial::LOG_MODE::VERBOSE)) {
         va_list args;
         va_start(args, msg);
         print(msg,args);
@@ -237,12 +200,12 @@ void MySerial::print(const char *format, va_list args) {
     }
 }
   
-bool MySerial::shouldPrint(Order::ARG mode){
+bool MySerial::shouldPrint(MySerial::LOG_MODE mode){
 	bool result = false;
-	int indexMode = getArrayPositionOfThisMode(mode);
-	if(logMode[indexMode]) result = true;
+	if(logMode[mode]) result = true;
 	return result;
 }
+
 
 
 

@@ -43,7 +43,7 @@ void MyI2C::init(int slaveAddress){
 }
 
 void MyI2C::receiveRoutine(int nBytes){
-	Serial.print("MyI2C said-> New I2c Event, Number of bytes:");Serial.println(nBytes);    
+	//Serial.print("MyI2C said-> New I2c Event, Number of bytes:");Serial.println(nBytes);    
     char inChar;
     char beginChar = Wire.read(); // is &
 	while (Wire.available()) {		
@@ -53,20 +53,22 @@ void MyI2C::receiveRoutine(int nBytes){
 		}
 		else{
 		    this->inputSentence += inChar; 
-            Serial.print("char:");Serial.println(inChar);
+            //Serial.print("char:");Serial.println(inChar);
 		}   		
 	}	
     if(!this->sentenceCompleteFlag){
-        Serial.println("MyI2C said-> Incomplete sentence; waiting for another stack.");
+        //Serial.println("MyI2C said-> Incomplete sentence; waiting for another stack.");
     }else{
-        Serial.print("MyI2C said-> Final Sentence:");Serial.println(this->inputSentence.c_str());
+       // Serial.print("MyI2C said-> Final Sentence:");Serial.println(this->inputSentence.c_str());
     }
     
 }
 
 void MyI2C::requestRoutine(){
-    Serial.print("MyI2C said-> respondo esta cant de bytes:");Serial.println(this->inputSentence.length());
-    Wire.write(this->inputSentence.c_str(),this->inputSentence.length());
+    //Serial.print("MyI2C said-> respondo esta cant de bytes:");Serial.println(this->inputSentence.length());
+    // Se tiene que responder con: NBuffers BufferX donde N son los buffers que quedan por dar
+    string response = inputSentence + '\0';
+    Wire.write(response.c_str(),response.length());
 }
 
 void MyI2C::flush(){

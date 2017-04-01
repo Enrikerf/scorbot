@@ -14,7 +14,7 @@
 #include <iostream>
 #include <ctype.h>
 // include serf libraries
-#include <Order.h>
+
 
 #if defined(ARDUINO) && ARDUINO >= 100
 	#include "Arduino.h"
@@ -42,18 +42,26 @@ class MySerial {
 		long           serialBaud;           // frecuency of serial communication
 		short 		   SERIAL_BUFFER_SIZE;   // size of hardwareSerial buffer 64
 		// Logger variables
+		enum LOG_MODE{
+			NOT_RECOGNIZED_CMD = -1,
+			NO_OUTPUT 		= 0,
+			INFO            = 1,
+			DEBUG           = 2,
+			ERROR           = 3,
+			VERBOSE         = 4
+		};
 		bool logMode[5]; 	
 		
 	public:
 
 		MySerial();
-		MySerial(long newSerialBaud,Order newOrder, string newLogMode);
+		MySerial(long newSerialBaud, string newLogMode);
 		void init();
 		void init(long newSerialBaud);	
 		// --------------------      SETS      --------------------
-		void setLogMode(Order::ARG newLogMode, Order::ARG  newStatus);
+		
 		// --------------------      GETS      --------------------
-		int getArrayPositionOfThisMode(Order::ARG mode);
+		int getArrayPositionOfThisMode(MySerial::LOG_MODE mode);
 		string getInputSentence();	
 		bool getSentenceCompleteFlag();
 		// --------------------      LOGS      --------------------
@@ -70,7 +78,7 @@ class MySerial {
 	private:		
 		
 		void print(const char *format, va_list args);
-		bool shouldPrint(Order::ARG mode);
+		bool shouldPrint(MySerial::LOG_MODE mode);
 
 		
 };

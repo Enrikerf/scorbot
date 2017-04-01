@@ -19,6 +19,7 @@
 #include <MySerial.h>
 #include <MyI2C.h>
 #include <Mycommunicator.h>
+#include <Axis.h>
 //#include <MyAxesController.h>
 
 
@@ -32,10 +33,10 @@ bool          masterFlag    = false;
 vector<int>   axisId ={0,1,2};
 int           slaveAddress = 4;
 
-Order injectedOrder = Order();
-MySerial      mySerial      = MySerial(serialBaud,injectedOrder,"DEBUG");
+MySerial      mySerial      = MySerial(serialBaud,"DEBUG");
 MyI2C         myI2C         = MyI2C(masterFlag,slaveAddress);
 MyCommunicator myComm             = MyCommunicator(token,&mySerial);
+Axis          axis1 = Axis(&mySerial);
 //MyAxesController     myController = MyAxesController(&mySerial,&myI2C,masterFlag,axisId);
 bool          serialError  = false; 
 

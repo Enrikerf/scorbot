@@ -13,6 +13,7 @@
 #include <iterator>
 #include <iostream>
 #include <ctype.h>
+#include <Array.h>
 // include serf libraries
 #include <Order.h>
 #include <MySerial.h>
@@ -24,44 +25,30 @@ class MyCommunicator {
 		MySerial       * mySerial;
 		string 		   sentence;
 		vector<string> sentenceComponents; 	 // Hold sentence components
-		char		   separatorOfComponents;
+		char		   separatorOfComponents;	
 		Order		   order;
-		vector<Order>  orders;               // Hold the incoming orders		
+		              	
 	public:
 
 		MyCommunicator(char newSeparatorOfComponents,MySerial *newMySerial);
 
 		~MyCommunicator(){}; 
 
-		vector<string> getSentenceComponents();
-
-		vector<Order> getOrders();
-
 		string getSentence();
-
+		vector<string> getSentenceComponents();
+		Order getOrder();
+		
 		void setSentence(string newSentence);
 
-		int parseSentenceByComponents();
-	
-		int	parseSentenceByOrders();
+		int parseSentenceByComponents(); // should be private
+		bool extractOrderOfSentence();
+		void flush();
 
 		void logSentenceComponents();
-
-		void logSentenceOrders();
-
-		void logSentenceOrders(vector<Order> orders2Plot);
+		void logSentenceOrder();
 			
 	private:		
-	
-		/** STATUS:IC ||	PARSE THE INPUT SENTENCE BY ORDERS */
-		int fillOrders(string cmdType, string cmd, vector<string> whos, vector<string> args);
-
-		/** STATUS:IC ||	PARSE THE INPUT SENTENCE BY ORDERS */
-		bool verifyWhos(vector<string> whos, vector<int> &whosInt);
-			
-		/** STATUS:V  ||	DEFAULT DESTRUCTOR */
 		int parseTool(string stringToParse, char token, vector<string> &stringParsed);
-		
 };
 
 
