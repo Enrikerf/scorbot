@@ -1,5 +1,5 @@
 global I2C_BUFFER_LENGTH
-I2C_BUFFER_LENGTH = 32
+I2C_BUFFER_LENGTH = 31
 import orders as myOrders
 
 def encodeString(givenString):
@@ -13,19 +13,21 @@ def encodeString(givenString):
             if findCmd(parsedString[1],encodedString):
                 #if the thirth parsed element is a who type
                 if findWhos(parsedString[2],encodedString):
-                    print("comando con destinatario")
+                    print("-->comando con destinatario")
                 else:
-                    #encodedString.append(parsedString[2])
-                    print("comando sin destinatario")
+                    print("-->comando sin destinatario")
                 del parsedString[:3]                
                 for component in parsedString:
                     encodedString.append(component)                    
             else:
-                 print("cmd invalido")
+                 print("-->cmd invalido")
+                 encodedString.append('!')    
         else:
-            print("cmd_type invalido!")
+            print("-->cmd_type invalido!")
+            encodedString.append('!')
     else: 
-        print("sentencia invalida")
+        print("-->sentencia invalida")
+        encodedString.append('!')
     return encodedString
 #endef
 
