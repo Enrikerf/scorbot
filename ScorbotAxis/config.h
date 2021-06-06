@@ -1,4 +1,6 @@
 
+
+
 /*
 ------------------------------------------------------------------------------------------------
 0         1         2         3         4         5         6         7         8         9
@@ -14,23 +16,27 @@
 #include <Wire.h>
 
 //#include <Order.h>
-//#include <MySerial.h>
+#include <MySerial.h>
 #include <MyI2C.h>
+#include <Mycommunicator.h>
+#include <Axis.h>
 //#include <MyAxesController.h>
 
+
 // Serial communication variables
-char    token                 = ' ';              // token for separate arguments
+char    token                 = ' ';              // token for separate sentence components
 int     serialBaud            = 9600; 
 
 /**  GLOBAL VARIABLES ------------------------------------------------------------------------*/
 
 bool          masterFlag    = false;
-//vector<int>   axisId ={0,1,2};
+vector<int>   axisId ={0,1,2};
 int           slaveAddress = 4;
 
-//Order         injectedOrder = Order();// hay que quitar la inyección de dependencia
-//MySerial static     mySerial      = MySerial(serialBaud,token,injectedOrder,"DEBUG");
-MyI2C    static     myI2C         = MyI2C(masterFlag,slaveAddress);
+MySerial      mySerial      = MySerial(serialBaud,"DEBUG");
+MyI2C         myI2C         = MyI2C(masterFlag,slaveAddress);
+MyCommunicator myComm             = MyCommunicator(token,&mySerial);
+Axis          axis1 = Axis(&mySerial);
 //MyAxesController     myController = MyAxesController(&mySerial,&myI2C,masterFlag,axisId);
 bool          serialError  = false; 
 

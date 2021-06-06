@@ -9,70 +9,92 @@
 #include <vector>
 #include <iterator>
 #include <iostream>
-
+#include <Array.h>
 using namespace std;
 
 class Order{	
 	public:
-	
-		enum    CMD_TYPE {
-			AXES=1,
-			ARD,
-			NO_RECONIZED_CMD_TYPE};
-							
-		enum    CMD {
-			BRAKE=1,
-			SET_BRAKE_PIN,
-			LOG_MODE,			
-			NO_RECONIZED_CMD};
+
+		enum CMD_TYPE {
+			ARD             = 0,
+			AXES            = 1,
+			LOG             = 2,
+			sizeOff_CMD_TYPE
 			
-		enum    ARG {
-			ALL=1,
-			ON,
-			OFF,
-			NO_OUTPUT,
-			ERROR,
-			INFO,
-			DEBUG,
-			VERBOSE,
-			NO_RECONIZED_ARG};
-		
-		string cmdType;
-		int    who;
-		string cmd;
-		string args;
-		vector<ARG> vectorArgs;
+		};
+
+		enum CMD_ARD {
+			NONE = 0,
+			sizeOff_CMD_ARD
+		};
+
+		enum CMD_AXES{
+			GET_BRAKE       = 0,
+			GET_DIR         = 1,
+			GET_PWM         = 2,
+			SET_BRAKE       = 3,
+			SET_DIR         = 4,
+			SET_PWM         = 5,
+			GET_BRAKE_PIN   = 6,
+			GET_DIR_PIN     = 7,
+			GET_PWM_PIN     = 8,
+			SET_BRAKE_PIN   = 9,
+			SET_DIR_PIN     = 10,
+			SET_PWM_PIN     = 11,
+			GET_SWITCH      = 12,
+			SET_SWITCH_PIN  = 13,
+			sizeOff_CMD_AXES
+		};
+
+		enum CMD_LOG{
+			INFO            = 0,
+			DEBUG           = 1,
+			ERROR           = 2,
+			VERBOSE         = 3,
+			sizeOff_CMD_LOG
+			
+		};
+
+		enum ARG{
+			ON              = 0,
+			OFF             = 1,
+			sizeOff_ARG_LOG
+
+		};
+
+		int cmdType;
+		int cmd;
+		vector<int> whos;
+		vector<string> args;
+
+
 		
 		/** STATUS:V  ||	DEFAULT CONSTRUCTOR */
 		Order();
 		
 		/** STATUS:V  ||	DEFAULT DESTRUCTOR */
 		~Order(){};
-		
-		/** STATUS:V  ||	DEFAULT DESTRUCTOR */
-		void setVectorArgs(vector<string> ParsedArgs);
-		
-		/** STATUS:IC || Recognize is a input string is a valid cmd type */
-		Order::CMD_TYPE recognizeCmdType(string Word);
 
-		/** STATUS:IC || Pass a self string type to his enum value	*/
-		Order::CMD_TYPE recognizeCmdType();
-		
-		/** STATUS:IC || Recognize is a input string is a valid cmd	 */
-		Order::CMD recognizeCmd(string Word);
+		bool setCmdType(string sNewCmdType);
 
-		/** STATUS:IC || Pass a self string type to his enum value	*/
-		Order::CMD recognizeCmd();
+		bool setCmd(string sNewCmdType,string sNewCmd);
 		
-		/** STATUS:IC ||	 */
-		Order::ARG recognizeArg(string Word);
-		
-		/** STATUS:IC ||	 */
-		Order::ARG recognizeArg();
+		bool setWhos(string sNewWhos);
+
+		bool setArgs(vector<string> newArgs);
+
+		bool recognizeCmdType(int cmdType);
+
+		bool recognizeCmd(int cmdType,int cmd);
+
+		bool extractWhos(string whos);
+
+		bool recognizeArgs(int cmd,int cmdType){};
 		
 		void clear();
 
 	private:
+		int parseTool(string stringToParse, char token, vector<string> &stringParsed);
 
 };
 

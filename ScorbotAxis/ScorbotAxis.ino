@@ -7,38 +7,46 @@
 
 // Configuration files
 #include "config.h"  
-
-
-int number = 0;
+#define phaseAPin  3 // external interrupt #0 for encoder phase A signal
+#define phaseBPin  4 // external interrupt #1 for encoder phase B signal
+int encoderValue;
+bool clockwise;
 /**SETUP FUNCTION */
 void setup() {  
-    //mySerial.init(); 
-    Serial.begin(serialBaud);
+    mySerial.init(); 
     myI2C.init();
+    encoderValue = 0;
+    clockwise = false;
     // Intentar que estas dos lineas estén en la clase myI2C; da problemas
     Wire.onReceive(receiveEvent);
     Wire.onRequest(requestEvent);
+    pinMode(phaseAPin, INPUT_PULLUP);
+    pinMode(phaseBPin, INPUT_PULLUP);
+    attachInterrupt(0, doEncoderA, CHANGE);
+    attachInterrupt(1, doEncoderB, CHANGE);
+    axis1.setId(1);
 }
 
 /**LOOP FUNCTION */
 void loop() {  
-
-/** 1- READ ALL DIGITAL INPUTS; ACTUAL STATE. ACTUAL IMAGE OF STATE MACHINE */ 
-/** 2- IF: CURRENT ARDUINO HAS BEEN SETED LIKE MASTER THEN EXECUTE THE MASTER ROUTINES (SEND ORDERS) ELSE: ?? */  
-/*
-    if(myController.getMasterFlag()){
-        myController.serialCommunications();
-        myController.filterMyOrders();
-        myController.sendOrders2Slaves();     
-    }else{
-        //myController.I2CCommunications();   
-    }   
-*/
-/** 4- PROCESS THE ORDERS */ 
-   // myController.processMyOrders(); 
-/** 5- ALL THE LOG WILL BE SHOWN */     
-/** 6- UPDATE IMAGE VARIABLES OF STATE MACHINE  */
-/** 7- PREPARE FOR ANOTHER LOOP  */   
+ 
+    if(myI2C.getSentenceCompleteFlag()){
+      myComm.setSentence(myI2C.getSentence());
+      myComm.extractOrderOfSentence();
+      myComm.logSentenceOrder();
+      //myAxesController.processOrder(MyComm.getOrder());
+      axis1.processCmd(myComm.getOrder().cmd,myComm.getOrder().args[0]);
+      myComm.flush();
+      myI2C.flush();
+      
+    }
+    Serial.print(encoderValue);
+    Serial.print("--");
+    Serial.print(digitalRead(phaseAPin));
+    Serial.print("--");
+    Serial.print(digitalRead(phaseBPin));
+    Serial.print("--");
+    Serial.println(clockwise);
     delay(2500);        
 }
 
@@ -47,7 +55,7 @@ void loop() {
 *  FUNCTIONS INTERRUPT ROUTINES
 *------------------------------------------------------------------------------------------------
 */
-/*
+
 // Serial interruption
 void serialEvent(){
   serialError =  mySerial.mySerialEvent();
@@ -57,15 +65,41 @@ void serialEvent(){
     mySerial.flush();
   }  
 }
-*/
+
 
 void receiveEvent(int nBytes){
   myI2C.receiveRoutine(nBytes);
-  myI2C.flush();
 }
 
 void requestEvent(){
   myI2C.requestRoutine();
 }
 
+void doEncoderA () {
+  if (digitalRead(phaseAPin) == digitalRead(phaseBPin)) {
+    encoderValue++;
+    clockwise = true;
+  }
+  else {
+    encoderValue--;
+    clockwise = false;
+  }
+}
+
+/*
+ * doEncoderB - ISR function for encoder phase B external interrupt
+ *
+ * If pinA and pinB are one high and the other low, it is spinning
+ * forward. If they're equal, it's going backward.
+*/
+void doEncoderB () {
+  if (digitalRead(phaseAPin) != digitalRead(phaseBPin)) {
+    encoderValue++;
+    clockwise = true;
+  }
+  else {
+    encoderValue--;
+    clockwise = false;
+  }
+}
 
